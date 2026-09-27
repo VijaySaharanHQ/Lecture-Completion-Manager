@@ -2,304 +2,671 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JEE Lecture Manager V1</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>JEE Lecture Command Center </title>
 
 <style>
-    *{
-        margin:0;
-        padding:0;
-        box-sizing:border-box;
-        font-family:Arial,sans-serif;
-    }
-
-    body{
-        background:#0f172a;
-        color:white;
-        padding:20px;
-    }
-
-    .container{
-        max-width:1100px;
-        margin:auto;
-    }
-
-    h1{
-        text-align:center;
-        margin-bottom:20px;
-    }
-
-    .card{
-        background:#1e293b;
-        padding:20px;
-        border-radius:15px;
-        margin-bottom:20px;
-    }
-
-    input, select, button{
-        padding:10px;
-        border:none;
-        border-radius:8px;
-        margin:5px;
-    }
-
-    input{
-        width:180px;
-    }
-
-    button{
-        background:#3b82f6;
-        color:white;
-        cursor:pointer;
-    }
-
-    button:hover{
-        opacity:0.9;
-    }
-
-    .stats{
-        display:grid;
-        grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-        gap:15px;
-    }
-
-    .stat{
-        background:#334155;
-        padding:15px;
-        border-radius:10px;
-        text-align:center;
-    }
-
-    table{
-        width:100%;
-        border-collapse:collapse;
-    }
-
-    th,td{
-        padding:10px;
-        text-align:center;
-        border-bottom:1px solid #475569;
-    }
-
-    .progress{
-        width:100%;
-        height:18px;
-        background:#475569;
-        border-radius:10px;
-    }
-
-    .fill{
-        height:100%;
-        background:#22c55e;
-        border-radius:10px;
-    }
-
-    textarea{
-        width:100%;
-        height:100px;
-        padding:10px;
-        border-radius:10px;
-        margin-top:10px;
-    }
-
-    .darkToggle{
-        float:right;
-    }
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+ --bg:#07111f;--card:#101d2f;--card2:#16253a;
+ --text:#f8fafc;--muted:#94a3b8;--primary:#38bdf8;
+ --green:#22c55e;--yellow:#f59e0b;--red:#ef4444;
+}
+body{
+ font-family:Inter,Arial,sans-serif;background:var(--bg);
+ color:var(--text);min-height:100vh;
+}
+.container{max-width:1200px;margin:auto;padding:20px}
+header{
+ display:flex;justify-content:space-between;align-items:center;
+ gap:15px;margin-bottom:25px
+}
+.logo h1{font-size:28px}
+.logo p{color:var(--muted);margin-top:5px}
+button{
+ border:0;border-radius:10px;padding:11px 15px;
+ cursor:pointer;font-weight:700;background:var(--primary);color:#00111c
+}
+button:hover{transform:translateY(-1px)}
+button.danger{background:var(--red);color:white}
+button.secondary{background:var(--card2);color:white}
+.grid{
+ display:grid;grid-template-columns:repeat(4,1fr);gap:15px;
+ margin-bottom:20px
+}
+.card{
+ background:var(--card);border:1px solid #1e3149;
+ border-radius:16px;padding:18px;margin-bottom:20px
+}
+.stat{min-height:120px}
+.stat small{color:var(--muted)}
+.stat h2{font-size:28px;margin-top:12px}
+.section-title{
+ display:flex;justify-content:space-between;align-items:center;
+ margin-bottom:15px;gap:10px
+}
+.section-title h2{font-size:19px}
+input,select,textarea{
+ width:100%;padding:11px;border-radius:9px;
+ border:1px solid #334155;background:#0b1727;color:white;
+ outline:none
+}
+textarea{resize:vertical;min-height:110px}
+.form{
+ display:grid;grid-template-columns:2fr 1fr 1fr auto;
+ gap:10px
+}
+.progress{
+ height:12px;background:#26364a;border-radius:20px;
+ overflow:hidden;margin:10px 0
+}
+.bar{height:100%;background:var(--green);transition:.3s}
+.lecture{
+ background:var(--card2);padding:15px;border-radius:13px;
+ margin-bottom:12px
+}
+.lecture-top{
+ display:flex;justify-content:space-between;align-items:center;
+ gap:10px
+}
+.lecture-name{font-weight:800}
+.meta{font-size:13px;color:var(--muted);margin-top:5px}
+.controls{
+ display:grid;grid-template-columns:repeat(4,1fr);
+ gap:8px;margin-top:10px
+}
+.controls input{font-size:13px}
+.status{
+ display:inline-block;padding:5px 9px;border-radius:20px;
+ font-size:12px;font-weight:bold
+}
+.done{background:#14532d;color:#86efac}
+.pending{background:#713f12;color:#fde68a}
+.plan{
+ display:grid;grid-template-columns:repeat(3,1fr);gap:10px
+}
+.plan-box{
+ background:var(--card2);padding:14px;border-radius:12px
+}
+.big{font-size:24px;font-weight:800;margin-top:5px}
+.note-actions{display:flex;gap:10px;margin-top:10px}
+.empty{text-align:center;color:var(--muted);padding:30px}
+.footer{text-align:center;color:var(--muted);padding:20px}
+@media(max-width:850px){
+ .grid{grid-template-columns:repeat(2,1fr)}
+ .form{grid-template-columns:1fr 1fr}
+ .plan{grid-template-columns:1fr}
+}
+@media(max-width:550px){
+ .container{padding:12px}
+ .grid{grid-template-columns:1fr 1fr}
+ .lecture-top{align-items:flex-start;flex-direction:column}
+ .controls{grid-template-columns:1fr 1fr}
+ .form{grid-template-columns:1fr}
+ header{align-items:flex-start;flex-direction:column}
+}
 </style>
 </head>
+
 <body>
 
 <div class="container">
 
-    <h1>⚡ JEE Lecture Manager V1</h1>
+<header>
+ <div class="logo">
+  <h1>⚡ JEE Lecture Command Center</h1>
+  <p>Watch smarter. Track everything. Finish the syllabus.</p>
+ </div>
+ <button class="secondary" onclick="resetAll()">Reset Data</button>
+</header>
 
-    <div class="card">
-        <h2>Add Lecture</h2>
+<!-- STATS -->
+<div class="grid">
 
-        <input type="text" id="name" placeholder="Lecture Name">
+ <div class="card stat">
+  <small>📚 Total Lectures</small>
+  <h2 id="totalLectures">0</h2>
+ </div>
 
-        <input type="number" id="duration" placeholder="Duration (hrs)">
+ <div class="card stat">
+  <small>⏱️ Total Duration</small>
+  <h2 id="totalDuration">0h</h2>
+ </div>
 
-        <select id="speed">
-            <option value="1">1x</option>
-            <option value="1.25">1.25x</option>
-            <option value="1.5">1.5x</option>
-            <option value="1.75">1.75x</option>
-            <option value="2">2x</option>
-        </select>
+ <div class="card stat">
+  <small>⚡ Effective Watch Time</small>
+  <h2 id="effectiveTime">0h</h2>
+ </div>
 
-        <button onclick="addLecture()">Add</button>
-    </div>
+ <div class="card stat">
+  <small>📊 Completion</small>
+  <h2 id="completion">0%</h2>
+ </div>
 
-    <div class="card">
-        <div class="stats">
-            <div class="stat">
-                <h3 id="totalLectures">0</h3>
-                <p>Total Lectures</p>
-            </div>
+</div>
 
-            <div class="stat">
-                <h3 id="totalHours">0</h3>
-                <p>Total Hours</p>
-            </div>
+<!-- ADD LECTURE -->
+<div class="card">
 
-            <div class="stat">
-                <h3 id="effectiveHours">0</h3>
-                <p>Effective Time</p>
-            </div>
+ <div class="section-title">
+  <h2>➕ Add Lecture</h2>
+ </div>
 
-            <div class="stat">
-                <h3 id="completion">0%</h3>
-                <p>Completed</p>
-            </div>
-        </div>
-    </div>
+ <div class="form">
 
-    <div class="card">
-        <h2>Lecture List</h2>
+  <input id="lectureName" placeholder="Lecture name">
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Duration</th>
-                    <th>Speed</th>
-                    <th>Effective Time</th>
-                    <th>Progress</th>
-                    <th>Done</th>
-                    <th>Delete</th>
-                </tr>
-            </thead>
+  <input id="lectureDuration"
+         type="number"
+         min="0.1"
+         step="0.1"
+         placeholder="Hours">
 
-            <tbody id="lectureTable"></tbody>
-        </table>
-    </div>
+  <select id="lectureSpeed">
+   <option value="1">1×</option>
+   <option value="1.25">1.25×</option>
+   <option value="1.5" selected>1.5×</option>
+   <option value="1.75">1.75×</option>
+   <option value="2">2×</option>
+  </select>
 
-    <div class="card">
-        <h2>Quick Notes</h2>
-        <textarea id="notes" placeholder="Write formulas, concepts, mistakes..."></textarea>
-    </div>
+  <button onclick="addLecture()">Add Lecture</button>
+
+ </div>
+
+</div>
+
+<!-- TODAY PLAN -->
+<div class="card">
+
+ <div class="section-title">
+  <h2>🎯 Today's Command Center</h2>
+  <button onclick="setTarget()">Set Daily Target</button>
+ </div>
+
+ <div class="plan">
+
+  <div class="plan-box">
+   <small>Today's Target</small>
+   <div class="big" id="dailyTarget">0 min</div>
+  </div>
+
+  <div class="plan-box">
+   <small>Today's Watched</small>
+   <div class="big" id="todayWatched">0 min</div>
+  </div>
+
+  <div class="plan-box">
+   <small>Remaining</small>
+   <div class="big" id="remainingToday">0 min</div>
+  </div>
+
+ </div>
+
+ <div class="progress">
+  <div class="bar" id="dailyBar"></div>
+ </div>
+
+</div>
+
+<!-- LECTURES -->
+<div class="card">
+
+ <div class="section-title">
+  <h2>🎥 Lecture Manager</h2>
+  <span id="lectureCountText"></span>
+ </div>
+
+ <div id="lectureList"></div>
+
+</div>
+
+<!-- QUESTIONS -->
+<div class="card">
+
+ <div class="section-title">
+  <h2>❓ Question Tracker</h2>
+ </div>
+
+ <div class="grid">
+
+  <div class="stat">
+   <small>Questions Solved</small>
+   <h2 id="questionsSolved">0</h2>
+  </div>
+
+  <div class="stat">
+   <small>PYQs Solved</small>
+   <h2 id="pyqsSolved">0</h2>
+  </div>
+
+  <div class="stat">
+   <small>Wrong Questions</small>
+   <h2 id="wrongQuestions">0</h2>
+  </div>
+
+  <div class="stat">
+   <small>Accuracy</small>
+   <h2 id="accuracy">0%</h2>
+  </div>
+
+ </div>
+
+ <div class="form">
+  <input id="qSolvedInput" type="number" placeholder="Questions solved">
+  <input id="pyqInput" type="number" placeholder="PYQs solved">
+  <input id="wrongInput" type="number" placeholder="Wrong questions">
+  <button onclick="updateQuestions()">Save</button>
+ </div>
+
+</div>
+
+<!-- NOTES -->
+<div class="card">
+
+ <div class="section-title">
+  <h2>📝 Quick Revision Notes</h2>
+ </div>
+
+ <textarea id="notes"
+ placeholder="Write formulas, concepts, mistakes, shortcuts..."></textarea>
+
+ <div class="note-actions">
+  <button onclick="saveNotes()">Save Notes</button>
+  <button class="secondary" onclick="clearNotes()">Clear</button>
+ </div>
+
+</div>
+
+<!-- DAILY TARGET -->
+<div class="card">
+
+ <div class="section-title">
+  <h2>🔥 Study System</h2>
+ </div>
+
+ <p style="color:var(--muted);line-height:1.7">
+ <b style="color:white">Recommended:</b><br>
+ 🎥 Theory → 1.5× default<br>
+ ⚡ Easy/repeated → 1.75–2×<br>
+ 🧠 Difficult concept → 1–1.25×<br>
+ ❓ Questions → Pause video and solve yourself<br>
+ 🔄 After lecture → 10–20 min active recall
+ </p>
+
+</div>
+
+<div class="footer">
+ JEE Lecture Command Center V2 • Your progress is saved automatically in this browser.
+</div>
 
 </div>
 
 <script>
 
-let lectures = JSON.parse(localStorage.getItem("lectures")) || [];
-document.getElementById("notes").value =
-localStorage.getItem("notes") || "";
+let data = JSON.parse(localStorage.getItem("jeeV2")) || {
+ lectures: [],
+ dailyTarget: 120,
+ todayWatched: 0,
+ questions: 0,
+ pyqs: 0,
+ wrong: 0,
+ notes: ""
+};
 
-document.getElementById("notes").addEventListener("input",()=>{
-    localStorage.setItem(
-        "notes",
-        document.getElementById("notes").value
-    );
-});
+function save(){
+ localStorage.setItem("jeeV2",JSON.stringify(data));
+ render();
+}
 
 function addLecture(){
 
-    let name = document.getElementById("name").value;
-    let duration = parseFloat(document.getElementById("duration").value);
-    let speed = parseFloat(document.getElementById("speed").value);
+ const name=document.getElementById("lectureName").value.trim();
+ const duration=parseFloat(document.getElementById("lectureDuration").value);
+ const speed=parseFloat(document.getElementById("lectureSpeed").value);
 
-    if(!name || !duration){
-        alert("Enter details");
-        return;
-    }
+ if(!name || !duration){
+  alert("Enter lecture name and duration.");
+  return;
+ }
 
-    lectures.push({
-        name,
-        duration,
-        speed,
-        done:false
-    });
+ data.lectures.push({
+  id:Date.now(),
+  name:name,
+  duration:duration,
+  speed:speed,
+  watched:0,
+  done:false,
+  revision:false
+ });
 
-    save();
+ document.getElementById("lectureName").value="";
+ document.getElementById("lectureDuration").value="";
+
+ save();
 }
 
-function save(){
-    localStorage.setItem(
-        "lectures",
-        JSON.stringify(lectures)
-    );
-    render();
+function updateLecture(id,field,value){
+
+ const lecture=data.lectures.find(x=>x.id===id);
+ if(!lecture)return;
+
+ if(field==="watched"){
+  value=Math.max(0,Math.min(parseFloat(value)||0,lecture.duration));
+  lecture.watched=value;
+  lecture.done=value>=lecture.duration;
+ }
+
+ if(field==="speed"){
+  lecture.speed=parseFloat(value);
+ }
+
+ save();
 }
 
-function toggleDone(index){
-    lectures[index].done =
-    !lectures[index].done;
-    save();
+function toggleRevision(id){
+
+ const lecture=data.lectures.find(x=>x.id===id);
+ if(!lecture)return;
+
+ lecture.revision=!lecture.revision;
+
+ save();
 }
 
-function removeLecture(index){
-    lectures.splice(index,1);
-    save();
+function deleteLecture(id){
+
+ if(confirm("Delete this lecture?")){
+  data.lectures=data.lectures.filter(x=>x.id!==id);
+  save();
+ }
+
+}
+
+function setTarget(){
+
+ const target=prompt(
+  "How many minutes do you want to study/watch today?",
+  data.dailyTarget
+ );
+
+ if(target!==null && !isNaN(target)){
+  data.dailyTarget=Math.max(0,parseInt(target));
+  save();
+ }
+
+}
+
+function updateQuestions(){
+
+ data.questions=Math.max(
+  0,
+  parseInt(document.getElementById("qSolvedInput").value)||0
+ );
+
+ data.pyqs=Math.max(
+  0,
+  parseInt(document.getElementById("pyqInput").value)||0
+ );
+
+ data.wrong=Math.max(
+  0,
+  parseInt(document.getElementById("wrongInput").value)||0
+ );
+
+ save();
+
+}
+
+function saveNotes(){
+
+ data.notes=document.getElementById("notes").value;
+ save();
+
+ alert("Notes saved!");
+
+}
+
+function clearNotes(){
+
+ if(confirm("Clear all notes?")){
+  data.notes="";
+  document.getElementById("notes").value="";
+  save();
+ }
+
+}
+
+function resetAll(){
+
+ if(confirm("This will delete ALL lecture data. Continue?")){
+  localStorage.removeItem("jeeV2");
+
+  data={
+   lectures:[],
+   dailyTarget:120,
+   todayWatched:0,
+   questions:0,
+   pyqs:0,
+   wrong:0,
+   notes:""
+  };
+
+  render();
+ }
+
+}
+
+function formatHours(hours){
+
+ if(hours<1){
+  return Math.round(hours*60)+"m";
+ }
+
+ const h=Math.floor(hours);
+ const m=Math.round((hours-h)*60);
+
+ return h+"h "+m+"m";
 }
 
 function render(){
 
-    let table = document.getElementById("lectureTable");
+ let totalDuration=0;
+ let effective=0;
+ let completed=0;
 
-    table.innerHTML="";
+ data.lectures.forEach(l=>{
 
-    let totalHours=0;
-    let effective=0;
-    let done=0;
+  totalDuration+=l.duration;
 
-    lectures.forEach((l,index)=>{
+  effective+=l.duration/l.speed;
 
-        totalHours += l.duration;
+  if(l.done)completed++;
 
-        effective += l.duration/l.speed;
+ });
 
-        if(l.done) done++;
+ const completion=data.lectures.length
+  ? Math.round((completed/data.lectures.length)*100)
+  :0;
 
-        let percent = l.done ? 100 : 0;
+ document.getElementById("totalLectures").textContent=
+ data.lectures.length;
 
-        table.innerHTML += `
-        <tr>
-            <td>${l.name}</td>
-            <td>${l.duration}h</td>
-            <td>${l.speed}x</td>
-            <td>${(l.duration/l.speed).toFixed(2)}h</td>
+ document.getElementById("totalDuration").textContent=
+ formatHours(totalDuration);
 
-            <td>
-                <div class="progress">
-                    <div class="fill"
-                    style="width:${percent}%"></div>
-                </div>
-            </td>
+ document.getElementById("effectiveTime").textContent=
+ formatHours(effective);
 
-            <td>
-                <input type="checkbox"
-                ${l.done?"checked":""}
-                onchange="toggleDone(${index})">
-            </td>
+ document.getElementById("completion").textContent=
+ completion+"%";
 
-            <td>
-                <button onclick="removeLecture(${index})">
-                X
-                </button>
-            </td>
-        </tr>
-        `;
-    });
+ document.getElementById("dailyTarget").textContent=
+ data.dailyTarget+" min";
 
-    document.getElementById("totalLectures").innerText =
-    lectures.length;
+ document.getElementById("todayWatched").textContent=
+ data.todayWatched+" min";
 
-    document.getElementById("totalHours").innerText =
-    totalHours.toFixed(1)+"h";
+ const remaining=Math.max(
+  0,
+  data.dailyTarget-data.todayWatched
+ );
 
-    document.getElementById("effectiveHours").innerText =
-    effective.toFixed(1)+"h";
+ document.getElementById("remainingToday").textContent=
+ remaining+" min";
 
-    let comp =
-    lectures.length==0 ?
-    0 :
-    (done/lectures.length)*100;
+ const dailyPercent=data.dailyTarget
+  ? Math.min(100,(data.todayWatched/data.dailyTarget)*100)
+  :0;
 
-    document.getElementById("completion").innerText =
-    comp.toFixed(0)+"%";
+ document.getElementById("dailyBar").style.width=
+ dailyPercent+"%";
+
+ document.getElementById("questionsSolved").textContent=
+ data.questions;
+
+ document.getElementById("pyqsSolved").textContent=
+ data.pyqs;
+
+ document.getElementById("wrongQuestions").textContent=
+ data.wrong;
+
+ const accuracy=data.questions
+  ? Math.max(
+    0,
+    Math.round(
+     ((data.questions-data.wrong)/data.questions)*100
+    )
+   )
+  :0;
+
+ document.getElementById("accuracy").textContent=
+ accuracy+"%";
+
+ document.getElementById("notes").value=
+ data.notes;
+
+ document.getElementById("lectureCountText").textContent=
+ data.lectures.length+" lectures";
+
+ const list=document.getElementById("lectureList");
+
+ if(!data.lectures.length){
+
+  list.innerHTML=
+  `<div class="empty">
+   No lectures yet.<br>
+   Add your first lecture above.
+  </div>`;
+
+  return;
+
+ }
+
+ list.innerHTML="";
+
+ data.lectures.forEach((l,index)=>{
+
+  const percent=l.duration
+   ? Math.min(100,(l.watched/l.duration)*100)
+   :0;
+
+  const effectiveTime=l.duration/l.speed;
+
+  list.innerHTML+=`
+
+  <div class="lecture">
+
+   <div class="lecture-top">
+
+    <div>
+     <div class="lecture-name">
+      ${index+1}. ${escapeHTML(l.name)}
+     </div>
+
+     <div class="meta">
+      ${l.duration}h total •
+      ${l.speed}× •
+      ${formatHours(effectiveTime)} effective
+     </div>
+    </div>
+
+    <span class="status ${l.done?"done":"pending"}">
+     ${l.done?"✓ COMPLETED":"IN PROGRESS"}
+    </span>
+
+   </div>
+
+   <div class="progress">
+    <div class="bar" style="width:${percent}%"></div>
+   </div>
+
+   <div style="display:flex;justify-content:space-between;
+   color:var(--muted);font-size:13px">
+    <span>${percent.toFixed(0)}% complete</span>
+    <span>${l.watched.toFixed(2)}h / ${l.duration}h</span>
+   </div>
+
+   <div class="controls">
+
+    <input
+     type="number"
+     min="0"
+     max="${l.duration}"
+     step="0.05"
+     value="${l.watched}"
+     onchange="updateLecture(${l.id},'watched',this.value)"
+     title="Watched hours">
+
+    <select
+     onchange="updateLecture(${l.id},'speed',this.value)">
+
+     <option value="1" ${l.speed==1?"selected":""}>1×</option>
+     <option value="1.25" ${l.speed==1.25?"selected":""}>1.25×</option>
+     <option value="1.5" ${l.speed==1.5?"selected":""}>1.5×</option>
+     <option value="1.75" ${l.speed==1.75?"selected":""}>1.75×</option>
+     <option value="2" ${l.speed==2?"selected":""}>2×</option>
+
+    </select>
+
+    <button
+     class="${l.revision?"":"secondary"}"
+     onclick="toggleRevision(${l.id})">
+
+     ${l.revision?"🔄 Revision Done":"🔄 Revision"}
+
+    </button>
+
+    <button
+     class="danger"
+     onclick="deleteLecture(${l.id})">
+
+     Delete
+
+    </button>
+
+   </div>
+
+  </div>
+
+  `;
+
+ });
+
+}
+
+function escapeHTML(str){
+
+ return str.replace(/[&<>"']/g,function(m){
+  return {
+   "&":"&amp;",
+   "<":"&lt;",
+   ">":"&gt;",
+   '"':"&quot;",
+   "'":"&#039;"
+  }[m];
+ });
+
 }
 
 render();
