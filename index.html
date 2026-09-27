@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JEE Lecture Manager V1</title>
+
+<style>
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+        font-family:Arial,sans-serif;
+    }
+
+    body{
+        background:#0f172a;
+        color:white;
+        padding:20px;
+    }
+
+    .container{
+        max-width:1100px;
+        margin:auto;
+    }
+
+    h1{
+        text-align:center;
+        margin-bottom:20px;
+    }
+
+    .card{
+        background:#1e293b;
+        padding:20px;
+        border-radius:15px;
+        margin-bottom:20px;
+    }
+
+    input, select, button{
+        padding:10px;
+        border:none;
+        border-radius:8px;
+        margin:5px;
+    }
+
+    input{
+        width:180px;
+    }
+
+    button{
+        background:#3b82f6;
+        color:white;
+        cursor:pointer;
+    }
+
+    button:hover{
+        opacity:0.9;
+    }
+
+    .stats{
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+        gap:15px;
+    }
+
+    .stat{
+        background:#334155;
+        padding:15px;
+        border-radius:10px;
+        text-align:center;
+    }
+
+    table{
+        width:100%;
+        border-collapse:collapse;
+    }
+
+    th,td{
+        padding:10px;
+        text-align:center;
+        border-bottom:1px solid #475569;
+    }
+
+    .progress{
+        width:100%;
+        height:18px;
+        background:#475569;
+        border-radius:10px;
+    }
+
+    .fill{
+        height:100%;
+        background:#22c55e;
+        border-radius:10px;
+    }
+
+    textarea{
+        width:100%;
+        height:100px;
+        padding:10px;
+        border-radius:10px;
+        margin-top:10px;
+    }
+
+    .darkToggle{
+        float:right;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>⚡ JEE Lecture Manager V1</h1>
+
+    <div class="card">
+        <h2>Add Lecture</h2>
+
+        <input type="text" id="name" placeholder="Lecture Name">
+
+        <input type="number" id="duration" placeholder="Duration (hrs)">
+
+        <select id="speed">
+            <option value="1">1x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+            <option value="1.75">1.75x</option>
+            <option value="2">2x</option>
+        </select>
+
+        <button onclick="addLecture()">Add</button>
+    </div>
+
+    <div class="card">
+        <div class="stats">
+            <div class="stat">
+                <h3 id="totalLectures">0</h3>
+                <p>Total Lectures</p>
+            </div>
+
+            <div class="stat">
+                <h3 id="totalHours">0</h3>
+                <p>Total Hours</p>
+            </div>
+
+            <div class="stat">
+                <h3 id="effectiveHours">0</h3>
+                <p>Effective Time</p>
+            </div>
+
+            <div class="stat">
+                <h3 id="completion">0%</h3>
+                <p>Completed</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Lecture List</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Duration</th>
+                    <th>Speed</th>
+                    <th>Effective Time</th>
+                    <th>Progress</th>
+                    <th>Done</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+
+            <tbody id="lectureTable"></tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>Quick Notes</h2>
+        <textarea id="notes" placeholder="Write formulas, concepts, mistakes..."></textarea>
+    </div>
+
+</div>
+
+<script>
+
+let lectures = JSON.parse(localStorage.getItem("lectures")) || [];
+document.getElementById("notes").value =
+localStorage.getItem("notes") || "";
+
+document.getElementById("notes").addEventListener("input",()=>{
+    localStorage.setItem(
+        "notes",
+        document.getElementById("notes").value
+    );
+});
+
+function addLecture(){
+
+    let name = document.getElementById("name").value;
+    let duration = parseFloat(document.getElementById("duration").value);
+    let speed = parseFloat(document.getElementById("speed").value);
+
+    if(!name || !duration){
+        alert("Enter details");
+        return;
+    }
+
+    lectures.push({
+        name,
+        duration,
+        speed,
+        done:false
+    });
+
+    save();
+}
+
+function save(){
+    localStorage.setItem(
+        "lectures",
+        JSON.stringify(lectures)
+    );
+    render();
+}
+
+function toggleDone(index){
+    lectures[index].done =
+    !lectures[index].done;
+    save();
+}
+
+function removeLecture(index){
+    lectures.splice(index,1);
+    save();
+}
+
+function render(){
+
+    let table = document.getElementById("lectureTable");
+
+    table.innerHTML="";
+
+    let totalHours=0;
+    let effective=0;
+    let done=0;
+
+    lectures.forEach((l,index)=>{
+
+        totalHours += l.duration;
+
+        effective += l.duration/l.speed;
+
+        if(l.done) done++;
+
+        let percent = l.done ? 100 : 0;
+
+        table.innerHTML += `
+        <tr>
+            <td>${l.name}</td>
+            <td>${l.duration}h</td>
+            <td>${l.speed}x</td>
+            <td>${(l.duration/l.speed).toFixed(2)}h</td>
+
+            <td>
+                <div class="progress">
+                    <div class="fill"
+                    style="width:${percent}%"></div>
+                </div>
+            </td>
+
+            <td>
+                <input type="checkbox"
+                ${l.done?"checked":""}
+                onchange="toggleDone(${index})">
+            </td>
+
+            <td>
+                <button onclick="removeLecture(${index})">
+                X
+                </button>
+            </td>
+        </tr>
+        `;
+    });
+
+    document.getElementById("totalLectures").innerText =
+    lectures.length;
+
+    document.getElementById("totalHours").innerText =
+    totalHours.toFixed(1)+"h";
+
+    document.getElementById("effectiveHours").innerText =
+    effective.toFixed(1)+"h";
+
+    let comp =
+    lectures.length==0 ?
+    0 :
+    (done/lectures.length)*100;
+
+    document.getElementById("completion").innerText =
+    comp.toFixed(0)+"%";
+}
+
+render();
+
+</script>
+
+</body>
+</html>
